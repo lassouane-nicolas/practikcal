@@ -6,6 +6,10 @@ node_modules/
 .env.local
 .env.*.local
 
+# Docker environment
+.env.docker
+backend/.env.docker
+
 # Build outputs
 dist/
 build/
