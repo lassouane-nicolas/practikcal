@@ -2,12 +2,18 @@ import 'dotenv/config'
 import express from 'express'
 import session from 'express-session'
 import connectPgSimple from 'connect-pg-simple'
+import cors from 'cors'
 import pool from './src/config/database.js'
 import authRouter from './src/routes/auth.routes.js'
 
 const app = express()
 
 app.use(express.json())
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  credentials: true,
+}))
 
 const PgSession = connectPgSimple(session)
 
