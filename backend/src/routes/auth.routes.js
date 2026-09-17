@@ -58,42 +58,50 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body
+  try {
+    const { email, password } = req.body
 
-  if (!email || !password) {
-    return res.status(400).json({
-      error: 'Email and password are required'
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'Email and password are required'
+      })
+    }
+
+    const result = await pool.query(
+      'SELECT id, password_hash FROM app_user WHERE email = $1',
+      [email]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        error: 'Invalid email or password'
+      })
+    }
+
+    const user = result.rows[0]
+    const passwordIsValid = await argon2.verify(
+      user.password_hash,
+      password
+    )
+
+    if (!passwordIsValid) {
+      return res.status(401).json({
+        error: 'Invalid email or password'
+      })
+    }
+
+    req.session.userId = user.id
+
+    return res.status(200).json({
+      message: 'Login successful'
+    })
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      error: 'Internal server error'
     })
   }
-
-  const result = await pool.query(
-    'SELECT id, password_hash FROM app_user WHERE email = $1',
-    [email]
-  )
-
-  if (result.rows.length === 0) {
-    return res.status(401).json({
-      error: 'Invalid email or password'
-    })
-  }
-
-  const user = result.rows[0]
-  const passwordIsValid = await argon2.verify(
-    user.password_hash,
-    password
-  )
-
-  if (!passwordIsValid) {
-    return res.status(401).json({
-      error: 'Invalid email or password'
-    })
-  }
-
-  req.session.userId = user.id
-
-  return res.status(200).json({
-    message: 'Login successful'
-  })
 })
 
 export default router
