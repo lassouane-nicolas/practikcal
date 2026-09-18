@@ -5,6 +5,7 @@ function AuthForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
 
     const isLogin = mode === 'login'
 
@@ -12,6 +13,7 @@ function AuthForm() {
         event.preventDefault()
 
         setError('')
+        setSuccess('')
 
         if (!email || !password) {
             setError('Veuillez remplir tous les champs.')
@@ -54,7 +56,13 @@ function AuthForm() {
                 return
             }
 
-            console.log(response.status, data)
+            if (isLogin) {
+                setSuccess('Connexion réussie.')
+            } else {
+                setMode('login')
+                setPassword('')
+                setSuccess('Compte créé avec succès. Vous pouvez maintenant vous connecter.')
+            }
         } catch (error) {
             setError('Impossible de contacter le serveur. Veuillez réessayer.')
         }
@@ -117,6 +125,15 @@ function AuthForm() {
                             role="alert"
                         >
                             {error}
+                        </p>
+                    )}
+
+                    {success && (
+                        <p
+                            className="text-sm text-green-600"
+                            role="status"
+                        >
+                            {success}
                         </p>
                     )}
 
