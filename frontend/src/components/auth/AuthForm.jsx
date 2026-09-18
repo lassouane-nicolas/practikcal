@@ -27,21 +27,37 @@ function AuthForm() {
             ? 'http://localhost:3000/auth/login'
             : 'http://localhost:3000/auth/register'
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                email,
-                password
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    email,
+                    password
+                })
             })
-        })
 
-        const data = await response.json()
+            const data = await response.json()
 
-        console.log(response.status, data)
+            if (!response.ok) {
+                if (response.status === 409) {
+                    setError('Un compte existe déjà avec cette adresse e-mail.')
+                } else if (response.status === 401) {
+                    setError('Email ou mot de passe incorrect.')
+                } else {
+                    setError('Une erreur est survenue. Veuillez réessayer.')
+                }
+
+                return
+            }
+
+            console.log(response.status, data)
+        } catch (error) {
+            setError('Impossible de contacter le serveur. Veuillez réessayer.')
+        }
     }
 
     return (
