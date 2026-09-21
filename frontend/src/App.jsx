@@ -33,8 +33,31 @@ function App() {
     return <p>Chargement...</p>
   }
 
+  async function handleLogout() {
+    try {
+      const response = await fetch('http://localhost:3000/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        return
+      }
+
+      setUser(null)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return user ? (
-    <p>Connecté en tant que {user.email}</p>
+    <div>
+      <p>Connecté en tant que {user.email}</p>
+
+      <button type="button" onClick={handleLogout}>
+        Se déconnecter
+      </button>
+    </div>
   ) : (
     <AuthForm />
   )
