@@ -1,5 +1,6 @@
 import AuthForm from "./components/auth/AuthForm";
 import Profile from './components/profile/Profile'
+import NutritionGoalsForm from './components/goals/NutritionGoalsForm'
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -69,6 +70,15 @@ function App() {
           user
             ? <Navigate to="/" replace />
             : <AuthForm />
+        }
+      />
+
+      <Route
+        path="/goals"
+        element={
+          user
+            ? <NutritionGoalsForm />
+            : <Navigate to="/login" replace />
         }
       />
 
