@@ -5,9 +5,11 @@ import connectPgSimple from 'connect-pg-simple'
 import cors from 'cors'
 import pool from './src/config/database.js'
 import authRouter from './src/routes/auth.routes.js'
+import goalsRouter from './src/routes/goals.routes.js'
 
 const app = express()
 
+// Global middleware
 app.use(express.json())
 
 app.use(cors({
@@ -15,6 +17,7 @@ app.use(cors({
   credentials: true,
 }))
 
+// Session configuration
 const PgSession = connectPgSimple(session)
 
 app.use(
@@ -36,12 +39,15 @@ app.use(
 
 const PORT = process.env.PORT
 
+// Routes
 app.get('/', (req, res) => {
   res.send('PractiKcal API is running')
 })
 
 app.use('/auth', authRouter)
+app.use('/goals', goalsRouter)
 
+// Server startup
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
