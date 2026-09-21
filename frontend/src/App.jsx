@@ -1,4 +1,5 @@
 import AuthForm from "./components/auth/AuthForm";
+import Profile from './components/profile/Profile'
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -68,6 +69,15 @@ function App() {
           user
             ? <Navigate to="/" replace />
             : <AuthForm />
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          user
+            ? <Profile user={user} onLogout={handleLogout} />
+            : <Navigate to="/login" replace />
         }
       />
     </Routes>
