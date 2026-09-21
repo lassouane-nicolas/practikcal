@@ -4,6 +4,51 @@ import { requireAuth } from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
+function validateNutritionGoal({
+  dailyCalories,
+  proteinPercentage,
+  carbsPercentage,
+  fatPercentage,
+  fiberGrams
+}) {
+  if (
+    dailyCalories === undefined ||
+    proteinPercentage === undefined ||
+    carbsPercentage === undefined ||
+    fatPercentage === undefined ||
+    fiberGrams === undefined
+  ) {
+    return 'All nutrition goal fields are required'
+  }
+
+  if (dailyCalories <= 0) {
+    return 'Daily calories must be greater than 0'
+  }
+
+  if (
+    proteinPercentage < 0 ||
+    carbsPercentage < 0 ||
+    fatPercentage < 0
+  ) {
+    return 'Macronutrient percentages must be greater than or equal to 0'
+  }
+
+  if (
+    proteinPercentage +
+    carbsPercentage +
+    fatPercentage !==
+    100
+  ) {
+    return 'Macronutrient percentages must total 100'
+  }
+
+  if (fiberGrams < 0) {
+    return 'Fiber goal must be greater than or equal to 0'
+  }
+
+  return null
+}
+
 router.get('/current', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
@@ -53,48 +98,17 @@ router.post('/', requireAuth, async (req, res) => {
       fiberGrams
     } = req.body
 
-    if (
-      dailyCalories === undefined ||
-      proteinPercentage === undefined ||
-      carbsPercentage === undefined ||
-      fatPercentage === undefined ||
-      fiberGrams === undefined
-    ) {
-      return res.status(400).json({
-        error: 'All nutrition goal fields are required'
-      })
-    }
+    const validationError = validateNutritionGoal({
+      dailyCalories,
+      proteinPercentage,
+      carbsPercentage,
+      fatPercentage,
+      fiberGrams
+    })
 
-    if (dailyCalories <= 0) {
+    if (validationError) {
       return res.status(400).json({
-        error: 'Daily calories must be greater than 0'
-      })
-    }
-
-    if (
-      proteinPercentage < 0 ||
-      carbsPercentage < 0 ||
-      fatPercentage < 0
-    ) {
-      return res.status(400).json({
-        error: 'Macronutrient percentages must be greater than or equal to 0'
-      })
-    }
-
-    if (
-      proteinPercentage +
-      carbsPercentage +
-      fatPercentage !==
-      100
-    ) {
-      return res.status(400).json({
-        error: 'Macronutrient percentages must total 100'
-      })
-    }
-
-    if (fiberGrams < 0) {
-      return res.status(400).json({
-        error: 'Fiber goal must be greater than or equal to 0'
+        error: validationError
       })
     }
 
@@ -130,6 +144,119 @@ router.post('/', requireAuth, async (req, res) => {
     )
 
     return res.status(201).json({
+      goal: result.rows[0]
+    })
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      error: 'Internal server error'
+    })
+  }
+})
+
+router.put('/current', requireAuth, async (req, res) => {
+  try {
+    const {
+      dailyCalories,
+      proteinPercentage,
+      carbsPercentage,
+      fatPercentage,
+      fiberGrams
+    } = req.body
+
+    const validationError = validateNutritionGoal({
+      dailyCalories,
+      proteinPercentage,
+      carbsPercentage,
+      fatPercentage,
+      fiberGrams
+    })
+
+    if (validationError) {
+      return res.status(400).json({
+        error: validationError
+      })
+    }
+
+    const existingGoal = await pool.query(
+      `
+        SELECT id
+        FROM nutrition_goal
+        WHERE user_id = $1
+          AND effective_from = CURRENT_DATE
+        LIMIT 1
+      `,
+      [req.session.userId]
+    )
+
+    if (existingGoal.rows.length > 0) {
+      const result = await pool.query(
+        `
+      UPDATE nutrition_goal
+      SET
+        daily_calories = $1,
+        protein_percentage = $2,
+        carbs_percentage = $3,
+        fat_percentage = $4,
+        fiber_grams = $5
+      WHERE id = $6
+      RETURNING
+        id,
+        daily_calories,
+        protein_percentage,
+        carbs_percentage,
+        fat_percentage,
+        fiber_grams,
+        effective_from
+    `,
+        [
+          dailyCalories,
+          proteinPercentage,
+          carbsPercentage,
+          fatPercentage,
+          fiberGrams,
+          existingGoal.rows[0].id
+        ]
+      )
+
+      return res.status(200).json({
+        goal: result.rows[0]
+      })
+    }
+
+    const result = await pool.query(
+      `
+    INSERT INTO nutrition_goal (
+      user_id,
+      daily_calories,
+      protein_percentage,
+      carbs_percentage,
+      fat_percentage,
+      fiber_grams,
+      effective_from
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, CURRENT_DATE)
+    RETURNING
+      id,
+      daily_calories,
+      protein_percentage,
+      carbs_percentage,
+      fat_percentage,
+      fiber_grams,
+      effective_from
+  `,
+      [
+        req.session.userId,
+        dailyCalories,
+        proteinPercentage,
+        carbsPercentage,
+        fatPercentage,
+        fiberGrams
+      ]
+    )
+
+    return res.status(200).json({
       goal: result.rows[0]
     })
   } catch (error) {
