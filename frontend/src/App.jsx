@@ -1,5 +1,6 @@
 import AuthForm from "./components/auth/AuthForm";
 import { useEffect, useState } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -29,10 +30,6 @@ function App() {
     fetchCurrentUser()
   }, [])
 
-  if (isLoading) {
-    return <p>Chargement...</p>
-  }
-
   async function handleLogout() {
     try {
       const response = await fetch('http://localhost:3000/auth/logout', {
@@ -50,16 +47,30 @@ function App() {
     }
   }
 
-  return user ? (
-    <div>
-      <p>Connecté en tant que {user.email}</p>
+  if (isLoading) {
+    return <p>Chargement...</p>
+  }
 
-      <button type="button" onClick={handleLogout}>
-        Se déconnecter
-      </button>
-    </div>
-  ) : (
-    <AuthForm />
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          user
+            ? <p>Connecté en tant que {user.email}</p>
+            : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/login"
+        element={
+          user
+            ? <Navigate to="/" replace />
+            : <AuthForm />
+        }
+      />
+    </Routes>
   )
 }
 
