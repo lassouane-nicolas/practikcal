@@ -1,6 +1,7 @@
 import express from 'express'
 import pool from '../config/database.js'
 import argon2 from 'argon2'
+import { requireAuth } from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
@@ -104,7 +105,7 @@ router.post('/login', async (req, res) => {
   }
 })
 
-router.get('/me', async (req, res) => {
+router.get('/me', requireAuth, async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({
       error: 'Not authenticated'
