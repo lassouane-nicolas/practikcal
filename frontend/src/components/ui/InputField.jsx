@@ -4,6 +4,7 @@ function InputField({
     type = 'text',
     error,
     icon: Icon,
+    suffix,
     ...props
 }) {
     return (
@@ -16,6 +17,21 @@ function InputField({
             </label>
 
             <div className="relative">
+                {suffix && (
+                    <span
+                        className="
+                          pointer-events-none
+                          absolute
+                          right-3
+                          top-1/2
+                          -translate-y-1/2
+                          text-sm
+                          text-[var(--color-text-muted)]
+                        "
+                    >
+                        {suffix}
+                    </span>
+                )}
                 {Icon && (
                     <Icon
                         aria-hidden="true"
@@ -43,7 +59,7 @@ function InputField({
                       border-[var(--color-border)]
                       bg-[var(--color-background)]
                       ${Icon ? 'pl-12' : 'px-4'}
-                      pr-4
+                      ${suffix ? 'pr-9' : 'pr-4'}
                       text-base
                       text-[var(--color-text)]
                       outline-none
