@@ -1,6 +1,7 @@
 import AuthForm from "./components/auth/AuthForm";
 import Profile from './components/profile/Profile'
 import NutritionGoalsForm from './components/goals/NutritionGoalsForm'
+import AppLayout from './layouts/AppLayout'
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -56,13 +57,27 @@ function App() {
   return (
     <Routes>
       <Route
-        path="/"
         element={
           user
-            ? <p>Connecté en tant que {user.email}</p>
+            ? <AppLayout />
             : <Navigate to="/login" replace />
         }
-      />
+      >
+        <Route
+          path="/"
+          element={<p>Connecté en tant que {user?.email}</p>}
+        />
+
+        <Route
+          path="/goals"
+          element={<NutritionGoalsForm />}
+        />
+
+        <Route
+          path="/profile"
+          element={<Profile user={user} onLogout={handleLogout} />}
+        />
+      </Route>
 
       <Route
         path="/login"
@@ -70,24 +85,6 @@ function App() {
           user
             ? <Navigate to="/" replace />
             : <AuthForm />
-        }
-      />
-
-      <Route
-        path="/goals"
-        element={
-          user
-            ? <NutritionGoalsForm />
-            : <Navigate to="/login" replace />
-        }
-      />
-
-      <Route
-        path="/profile"
-        element={
-          user
-            ? <Profile user={user} onLogout={handleLogout} />
-            : <Navigate to="/login" replace />
         }
       />
     </Routes>
