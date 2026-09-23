@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import InputField from '../ui/InputField'
 import Button from '../ui/Button'
+import logo from '../../assets/practikcal-logo.png'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 function AuthForm() {
     const [mode, setMode] = useState('login')
@@ -8,6 +10,7 @@ function AuthForm() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
 
     const isLogin = mode === 'login'
 
@@ -71,37 +74,78 @@ function AuthForm() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-            <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                    {isLogin ? 'Connexion' : 'Créer un compte'}
-                </h1>
+        <main className="min-h-screen bg-[var(--color-background)] px-6">
+            <section className="mx-auto w-full max-w-sm pt-24">
+                <div className="text-center">
+                    <img
+                        src={logo}
+                        alt="Logo PractiKcal"
+                        className="mx-auto mb-2 h-28 w-28 object-contain"
+                    />
+                    <h1 className="text-3xl font-bold">
+                        Practi<span className="text-[var(--color-primary)]">Kcal</span>
+                    </h1>
 
-                <p className="mt-2 text-sm text-gray-600">
-                    {isLogin
-                        ? 'Connectez-vous à votre compte PractiKcal.'
-                        : 'Créez votre compte pour commencer votre suivi.'}
-                </p>
+                    <p className="mt-4 text-xl font-semibold">
+                        {isLogin ? 'Se connecter' : 'Créer un compte'}
+                    </p>
+                </div>
 
                 <form
-                    className="mt-6 space-y-4"
+                    className="mt-8 space-y-5"
                     onSubmit={handleSubmit}
                 >
                     <InputField
                         id="email"
                         label="E-mail"
                         type="email"
+                        icon={Mail}
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                     />
 
-                    <InputField
-                        id="password"
-                        label="Mot de passe"
-                        type="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                    />
+                    <div className="space-y-1">
+                        <div className="relative">
+                            <InputField
+                                id="password"
+                                label="Mot de passe"
+                                type={showPassword ? 'text' : 'password'}
+                                icon={Lock}
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword((current) => !current)}
+                                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                className="
+                                  absolute
+                                  right-4
+                                  top-[42px]
+                                  text-[var(--color-text-muted)]
+                                "
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                                ) : (
+                                    <Eye className="h-5 w-5" aria-hidden="true" />
+                                )}
+                            </button>
+                        </div>
+
+                        {isLogin && (
+                            <div className="text-right">
+                                <button
+                                    type="button"
+                                    className="text-sm font-medium text-[var(--color-primary)]"
+
+                                >
+                                    Mot de passe oublié ?
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {error && (
                         <p
@@ -127,15 +171,29 @@ function AuthForm() {
                 </form>
 
 
-                <button
-                    type="button"
-                    className="mt-6 text-sm font-medium text-gray-700 underline"
-                    onClick={() => setMode(isLogin ? 'register' : 'login')}
-                >
-                    {isLogin
-                        ? 'Créer un compte'
-                        : 'J’ai déjà un compte'}
-                </button>
+                <div className="mt-8 text-center">
+                    <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-[var(--color-border)]" />
+
+                        <p className="text-sm text-[var(--color-text-muted)]">
+                            {isLogin
+                                ? 'Pas encore de compte ?'
+                                : 'Déjà un compte ?'}
+                        </p>
+
+                        <div className="h-px flex-1 bg-[var(--color-border)]" />
+                    </div>
+
+                    <button
+                        type="button"
+                        className="mt-2 text-base font-medium text-[var(--color-primary)]"
+                        onClick={() => setMode(isLogin ? 'register' : 'login')}
+                    >
+                        {isLogin
+                            ? 'Créer un compte'
+                            : 'Se connecter'}
+                    </button>
+                </div>
             </section>
         </main>
     )
