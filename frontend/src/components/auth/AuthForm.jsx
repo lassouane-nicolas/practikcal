@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import InputField from '../ui/InputField'
+import Button from '../ui/Button'
 
 function AuthForm() {
     const [mode, setMode] = useState('login')
@@ -85,39 +87,21 @@ function AuthForm() {
                     className="mt-6 space-y-4"
                     onSubmit={handleSubmit}
                 >
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Email
-                        </label>
+                    <InputField
+                        id="email"
+                        label="E-mail"
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                    />
 
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Mot de passe
-                        </label>
-
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(event) => setPassword(event.target.value)}
-                            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
-                        />
-                    </div>
+                    <InputField
+                        id="password"
+                        label="Mot de passe"
+                        type="password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                    />
 
                     {error && (
                         <p
@@ -137,12 +121,9 @@ function AuthForm() {
                         </p>
                     )}
 
-                    <button
-                        type="submit"
-                        className="w-full rounded-lg bg-gray-900 px-4 py-2 font-medium text-white"
-                    >
+                    <Button type="submit">
                         {isLogin ? 'Se connecter' : 'Créer mon compte'}
-                    </button>
+                    </Button>
                 </form>
 
 
