@@ -8,29 +8,43 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 function App() {
   const [user, setUser] = useState(null)
+  const [hasGoal, setHasGoal] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchCurrentUser() {
-      try {
-        const response = await fetch('http://localhost:3000/auth/me', {
-          credentials: 'include'
-        })
+  async function fetchCurrentUser() {
+    try {
+      const response = await fetch('http://localhost:3000/auth/me', {
+        credentials: 'include'
+      })
 
-        if (!response.ok) {
-          setUser(null)
-          return
-        }
-
-        const data = await response.json()
-        setUser(data.user)
-      } catch (error) {
+      if (!response.ok) {
         setUser(null)
-      } finally {
-        setIsLoading(false)
+        setHasGoal(null)
+        return
       }
-    }
 
+      const data = await response.json()
+
+      const goalResponse = await fetch('http://localhost:3000/goals/current', {
+        credentials: 'include'
+      })
+
+      if (goalResponse.status === 404) {
+        setHasGoal(false)
+      } else if (goalResponse.ok) {
+        setHasGoal(true)
+      }
+
+      setUser(data.user)
+    } catch (error) {
+      setUser(null)
+      setHasGoal(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchCurrentUser()
   }, [])
 
@@ -66,7 +80,11 @@ function App() {
       >
         <Route
           path="/"
-          element={<p>Connecté en tant que {user?.email}</p>}
+          element={
+            hasGoal === false
+              ? <Navigate to="/goals" replace />
+              : <p>Connecté en tant que {user?.email}</p>
+          }
         />
 
         <Route
@@ -89,8 +107,8 @@ function App() {
         path="/login"
         element={
           user
-            ? <Navigate to="/" replace />
-            : <AuthForm />
+            ? <Navigate to={hasGoal ? '/' : '/goals'} replace />
+            : <AuthForm onLoginSuccess={fetchCurrentUser} />
         }
       />
     </Routes>
