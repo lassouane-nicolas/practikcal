@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, Info } from 'lucide-react'
 import Button from '../ui/Button'
 import InputField from '../ui/InputField'
@@ -18,6 +19,7 @@ function NutritionGoalsForm() {
   const [customProteinPercentage, setCustomProteinPercentage] = useState(15)
   const [customCarbsPercentage, setCustomCarbsPercentage] = useState(50)
   const [customFatPercentage, setCustomFatPercentage] = useState(35)
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchCurrentGoal() {
@@ -184,7 +186,8 @@ function NutritionGoalsForm() {
         >
           <button
             type="button"
-            aria-label="Retour"
+            aria-label="Retour au profil"
+            onClick={() => navigate('/profile')}
             className="
                             flex
                             h-10
