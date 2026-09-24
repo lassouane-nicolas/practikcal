@@ -56,7 +56,11 @@ function Profile({ user, onLogout }) {
             Modifier mes objectifs nutritionnels
           </Link>
 
-          <Button type="button" onClick={onLogout}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onLogout}
+          >
             Se déconnecter
           </Button>
         </div>

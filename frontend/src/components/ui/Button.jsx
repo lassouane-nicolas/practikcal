@@ -1,25 +1,43 @@
-function Button({ children, type = 'button', ...props }) {
+function Button({
+  children,
+  type = 'button',
+  variant = 'primary',
+  ...props
+}) {
+  const variantClasses = {
+    primary: `
+    bg-[var(--color-primary)]
+    text-white
+    hover:brightness-95
+  `,
+    secondary: `
+    border
+    border-[var(--color-border)]
+    bg-[var(--color-background)]
+    text-[var(--color-text)]
+    hover:bg-sky-50
+  `
+  }
+
   return (
     <button
       type={type}
-      className="
+      className={`
         w-full
         min-h-12
         rounded-xl
-        bg-[var(--color-primary)]
         px-4
         text-base
         font-semibold
-        text-white
         transition
-        hover:brightness-95
         focus-visible:outline-none
         focus-visible:ring-2
         focus-visible:ring-[var(--color-primary)]
         focus-visible:ring-offset-2
         disabled:cursor-not-allowed
         disabled:opacity-50
-      "
+        ${variantClasses[variant]}
+      `}
       {...props}
     >
       {children}
