@@ -73,6 +73,22 @@ Authenticated users can define and update their nutrition goals:
 
 The interface provides default and custom macronutrient distributions and displays the equivalent macronutrient quantities in grams.
 
+## Backend Tests
+
+Backend integration tests use Vitest and Supertest with a dedicated PostgreSQL test database.
+
+From the `backend/` directory:
+
+```bash
+npm test
+```
+
+Run the full test suite once without watch mode:
+
+```bash
+npm test -- --run
+```
+
 ## Development Setup
 
 The development environment uses Docker Compose for the application services and PostgreSQL.
