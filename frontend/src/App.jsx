@@ -1,5 +1,6 @@
 import AuthForm from "./components/auth/AuthForm";
 import Profile from './components/profile/Profile'
+import Actions from './components/actions/Actions'
 import NutritionGoalsForm from './components/goals/NutritionGoalsForm'
 import AppLayout from './layouts/AppLayout'
 import { useEffect, useState } from 'react'
@@ -66,6 +67,11 @@ function App() {
         <Route
           path="/"
           element={<p>Connecté en tant que {user?.email}</p>}
+        />
+
+        <Route
+          path="/actions"
+          element={<Actions />}
         />
 
         <Route

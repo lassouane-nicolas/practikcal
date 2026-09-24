@@ -1,10 +1,19 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import BottomNavigation from '../components/ui/BottomNavigation'
 
 function AppLayout() {
+  const location = useLocation()
+
+  const showBottomNavigation = location.pathname !== '/goals'
+
   return (
-    <main>
-      <Outlet />
-    </main>
+    <>
+      <main>
+        <Outlet />
+      </main>
+
+      {showBottomNavigation && <BottomNavigation />}
+    </>
   )
 }
 
