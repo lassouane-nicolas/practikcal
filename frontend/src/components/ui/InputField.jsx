@@ -1,5 +1,6 @@
 function InputField({
     label,
+    ariaLabel,
     id,
     type = 'text',
     error,
@@ -51,6 +52,7 @@ function InputField({
                 <input
                     id={id}
                     type={type}
+                    aria-label={ariaLabel}
                     className={`
                       w-full
                       min-h-12
