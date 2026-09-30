@@ -224,4 +224,102 @@ router.post('/', requireAuth, async (req, res) => {
   }
 })
 
+router.put('/:id', requireAuth, async (req, res) => {
+  try {
+    const foodId = Number(req.params.id)
+
+    if (!Number.isInteger(foodId) || foodId <= 0) {
+      return res.status(400).json({
+        error: 'Invalid food id'
+      })
+    }
+
+    const {
+      name,
+      brand,
+      referenceUnit,
+      caloriesPer100,
+      proteinPer100,
+      carbsPer100,
+      fatPer100,
+      fiberPer100
+    } = req.body
+
+    const validationError = validateFood({
+      name,
+      referenceUnit,
+      caloriesPer100,
+      proteinPer100,
+      carbsPer100,
+      fatPer100,
+      fiberPer100
+    })
+
+    if (validationError) {
+      return res.status(400).json({
+        error: validationError
+      })
+    }
+
+    const result = await pool.query(
+      `
+        UPDATE food
+        SET
+          name = $1,
+          brand = $2,
+          reference_unit = $3,
+          calories_per_100 = $4,
+          protein_per_100 = $5,
+          carbs_per_100 = $6,
+          fat_per_100 = $7,
+          fiber_per_100 = $8,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $9
+          AND user_id = $10
+          AND source = 'USER'
+        RETURNING
+          id,
+          name,
+          brand,
+          source,
+          reference_unit,
+          calories_per_100,
+          protein_per_100,
+          carbs_per_100,
+          fat_per_100,
+          fiber_per_100,
+          updated_at
+      `,
+      [
+        name.trim(),
+        brand ?? null,
+        referenceUnit,
+        caloriesPer100 ?? null,
+        proteinPer100 ?? null,
+        carbsPer100 ?? null,
+        fatPer100 ?? null,
+        fiberPer100 ?? null,
+        foodId,
+        req.session.userId
+      ]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: 'Food not found'
+      })
+    }
+
+    return res.status(200).json({
+      food: result.rows[0]
+    })
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      error: 'Internal server error'
+    })
+  }
+})
+
 export default router
