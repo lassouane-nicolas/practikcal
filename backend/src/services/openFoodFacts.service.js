@@ -120,7 +120,3 @@ export async function getOpenFoodFactsProduct(barcode) {
 
   return normalizeOpenFoodFactsProduct(data.product)
 }
-
-getOpenFoodFactsProduct('3564700396612')
-  .then(data => console.dir(data, { depth: null }))
-  .catch(console.error)
