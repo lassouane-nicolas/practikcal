@@ -1,7 +1,7 @@
 import express from 'express'
 import pool from '../config/database.js'
 import { requireAuth } from '../middlewares/auth.middleware.js'
-import { searchLocalFoods } from '../services/food.service.js'
+import { searchFoods } from '../services/food.service.js'
 
 const router = express.Router()
 
@@ -51,7 +51,7 @@ router.get('/', requireAuth, async (req, res) => {
       })
     }
 
-    const foods = await searchLocalFoods(
+    const foods = await searchFoods(
       search,
       req.session.userId
     )

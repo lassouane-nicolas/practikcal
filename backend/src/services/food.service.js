@@ -1,4 +1,5 @@
 import pool from '../config/database.js'
+import { searchOpenFoodFacts } from './openFoodFacts.service.js'
 
 export async function searchLocalFoods(search, userId) {
   const result = await pool.query(
@@ -29,4 +30,11 @@ export async function searchLocalFoods(search, userId) {
   )
 
   return result.rows
+}
+
+export async function searchFoods(search, userId) {
+  const localFoods = await searchLocalFoods(search, userId)
+  const externalFoods = await searchOpenFoodFacts(search)
+
+  return [...localFoods, ...externalFoods]
 }
