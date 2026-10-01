@@ -8,15 +8,15 @@ PractiKcal is a responsive web application for nutrition tracking, developed as 
 - Backend: Node.js, Express
 - Database: PostgreSQL
 - Authentication: Argon2id, express-session, connect-pg-simple
-- External food data: Open Food Facts
-- Development environment: Docker Compose
+- External food data: Open Food Facts / Search-a-licious
+- Development environment: local Node.js/Vite development with PostgreSQL via Docker Compose
 
 ## Project Structure
 
 PractiKcal uses a monorepo structure:
 
 - `frontend/`: React application
-- `backend/`: Node.js and Express API
+- `backend/`: Node.js and Express API, including routes, middleware, services and database access
 - `database/`: PostgreSQL migrations and database initialization
 - `docs/`: project documentation
 
@@ -73,6 +73,60 @@ Authenticated users can define and update their nutrition goals:
 
 The interface provides default and custom macronutrient distributions and displays the equivalent macronutrient quantities in grams.
 
+## Food Catalog
+
+The backend provides a unified food catalog combining local application data and external food sources.
+
+The current food model supports three origins:
+
+- `USER`: personal foods created by an authenticated user
+- `OFF`: commercial products imported from Open Food Facts
+- `CIQUAL`: reserved for generic reference foods
+
+Personal foods are isolated by user. Open Food Facts and CIQUAL foods are global application data.
+
+The food catalog supports:
+
+- food search
+- food detail retrieval
+- creation of personal foods
+- update and deletion of personal foods
+- validation of reference units (`g` or `ml`)
+- nullable nutritional values when data is unknown
+
+The database also includes food portions and journal-entry structures in preparation for food consumption tracking.
+
+## Open Food Facts Integration
+
+Commercial food products are retrieved from Open Food Facts through the backend.
+
+Text search uses Search-a-licious and returns a limited, normalized set of fields required by PractiKcal.
+
+Search results are treated as partial external data and are not persisted immediately.
+
+When a user selects an Open Food Facts product:
+
+1. the backend retrieves the latest product data through the Open Food Facts product API;
+2. the product is normalized into the internal food model;
+3. the nutritional reference unit is derived from `nutrition_data_per`;
+4. the product is inserted into PostgreSQL if it does not already exist;
+5. an existing product is updated with the latest available Open Food Facts data.
+
+Missing nutritional values remain `null` and are never converted to `0`.
+
+If kcal values are unavailable but kJ values are present, PractiKcal converts the energy value to kcal.
+
+Open Food Facts errors are handled explicitly, including:
+
+- invalid barcode
+- product not found
+- incomplete product data
+- unavailable external service
+
+The product barcode is used as the external product reference.
+
+Future optimization: Open Food Facts revision metadata may be stored to avoid unnecessary database updates when a remote product has not changed.
+
 ## Backend Tests
 
 Backend integration tests use Vitest and Supertest with a dedicated PostgreSQL test database.
@@ -91,15 +145,27 @@ npm test -- --run
 
 ## Development Setup
 
-The development environment uses Docker Compose for the application services and PostgreSQL.
+PractiKcal can be run with Docker Compose, but the current development workflow runs the frontend and backend locally while PostgreSQL remains containerized.
 
-Environment variables are defined locally and are not committed to the repository. Example configuration files are provided when needed.
+Typical local development setup:
 
-The frontend production build can be verified from the `frontend/` directory:
+- PostgreSQL runs in Docker Compose
+- Backend runs locally with Node.js watch mode
+- Frontend runs locally with Vite
+
+From the `backend/` directory:
 
 ```bash
-npm run build
+npm run dev
 ```
+
+From the frontend/ directory:
+
+```bash
+npm run dev
+```
+
+Environment variables are defined locally and are not committed to the repository.
 
 ## Code Style
 
@@ -109,6 +175,37 @@ Project formatting rules are defined in .editorconfig.
 
 ## Status
 
-Currently in development — Sprint 1.
+Currently in development — Sprint 2: Foods & Journal.
 
-Implemented foundations include authentication, persistent sessions, protected routes, nutrition goals management and the initial reusable frontend interface architecture.
+Implemented foundations include:
+
+- authentication and persistent sessions
+- protected frontend and backend routes
+- nutrition goals management
+- reusable responsive interface foundations
+- food database schema
+- local food catalog
+- personal food CRUD
+- Open Food Facts text search
+- Open Food Facts product normalization and synchronization
+- initial food portion and journal-entry database structures
+
+Current Sprint 2 work focuses on completing the food data sources, implementing the food journal backend and connecting the search/add-food user flow.
+
+## Data Sources and Licenses
+
+PractiKcal uses external food composition data from:
+
+- **Open Food Facts** — database available under the Open Database License (ODbL). Individual database contents are covered by the Database Contents License. Product images, when used, are available under the Creative Commons Attribution-ShareAlike license.
+- **Ciqual / Anses** — data from the French food composition table, reused under the Licence Ouverte. Source: *Anses. 2025. Table de composition nutritionnelle des aliments Ciqual*.
+
+PractiKcal normalizes these external data sources into its own internal data model. External data may be incomplete or evolve over time.
+
+## Author
+
+**Nicolas Lassouane**  
+Web developer in professional retraining, currently preparing the French DWWM professional certification.
+
+PractiKcal is developed as a portfolio and certification project focused on full-stack web development, API integration, PostgreSQL data modeling and responsive frontend development.
+
+GitHub: [lassouane-nicolas](https://github.com/lassouane-nicolas)
