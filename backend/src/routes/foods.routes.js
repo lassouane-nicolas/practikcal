@@ -1,7 +1,10 @@
 import express from 'express'
 import pool from '../config/database.js'
 import { requireAuth } from '../middlewares/auth.middleware.js'
-import { searchFoods } from '../services/food.service.js'
+import {
+  searchFoods,
+  syncOpenFoodFactsProduct
+} from '../services/food.service.js'
 
 const router = express.Router()
 
@@ -334,6 +337,46 @@ router.delete('/:id', requireAuth, async (req, res) => {
 
     return res.status(500).json({
       error: 'Internal server error'
+    })
+  }
+})
+
+router.post('/off/:barcode', requireAuth, async (req, res) => {
+  try {
+    const { barcode } = req.params
+
+    if (!/^\d+$/.test(barcode)) {
+      return res.status(400).json({
+        error: 'Invalid barcode'
+      })
+    }
+
+    const food = await syncOpenFoodFactsProduct(barcode)
+
+    return res.status(200).json({ food })
+  } catch (error) {
+    console.error(error)
+
+    if (error.code === 'OFF_PRODUCT_NOT_FOUND') {
+      return res.status(404).json({
+        error: 'Open Food Facts product not found'
+      })
+    }
+
+    if (error.code === 'OFF_PRODUCT_INCOMPLETE') {
+      return res.status(422).json({
+        error: 'Open Food Facts product is incomplete'
+      })
+    }
+
+    if (error.code === 'OFF_EXTERNAL_ERROR') {
+      return res.status(502).json({
+        error: 'Open Food Facts service unavailable'
+      })
+    }
+
+    return res.status(500).json({
+      error: 'Failed to synchronize Open Food Facts product'
     })
   }
 })

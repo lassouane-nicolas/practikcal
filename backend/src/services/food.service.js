@@ -46,7 +46,10 @@ export async function syncOpenFoodFactsProduct(barcode) {
   const product = await getOpenFoodFactsProduct(barcode)
 
   if (!product.name || !product.referenceUnit) {
-    throw new Error('Open Food Facts product is incomplete')
+    const error = new Error('Open Food Facts product is incomplete')
+    error.code = 'OFF_PRODUCT_INCOMPLETE'
+
+    throw error
   }
 
   const existingFood = await pool.query(

@@ -94,29 +94,55 @@ const PRODUCT_URL = 'https://world.openfoodfacts.org/api/v3/product'
 
 // Product details are enriched before being converted into a valid Food entity.
 export async function getOpenFoodFactsProduct(barcode) {
-  const fields = [
-    'code',
-    'product_name',
-    'brands',
-    'product_quantity_unit',
-    'nutrition_data_per',
-    'nutriments'
-  ].join(',')
+  try {
+    const fields = [
+      'code',
+      'product_name',
+      'brands',
+      'product_quantity_unit',
+      'nutrition_data_per',
+      'nutriments'
+    ].join(',')
 
-  const response = await fetch(
-    `${PRODUCT_URL}/${barcode}?fields=${fields}`,
-    {
-      headers: {
-        'User-Agent': 'PractiKcal/0.1'
+    const response = await fetch(
+      `${PRODUCT_URL}/${barcode}?fields=${fields}`,
+      {
+        headers: {
+          'User-Agent': 'PractiKcal/0.1'
+        }
       }
+    )
+
+    if (response.status === 404) {
+      const error = new Error('Open Food Facts product not found')
+      error.code = 'OFF_PRODUCT_NOT_FOUND'
+
+      throw error
     }
-  )
 
-  if (!response.ok) {
-    throw new Error(`Open Food Facts product request failed: ${response.status}`)
+    if (!response.ok) {
+      const error = new Error(
+        `Open Food Facts product request failed: ${response.status}`
+      )
+      error.code = 'OFF_EXTERNAL_ERROR'
+
+      throw error
+    }
+
+    const data = await response.json()
+
+    return normalizeOpenFoodFactsProduct(data.product)
+  } catch (error) {
+    if (
+      error.code === 'OFF_PRODUCT_NOT_FOUND' ||
+      error.code === 'OFF_EXTERNAL_ERROR'
+    ) {
+      throw error
+    }
+
+    const externalError = new Error('Open Food Facts is unavailable')
+    externalError.code = 'OFF_EXTERNAL_ERROR'
+
+    throw externalError
   }
-
-  const data = await response.json()
-
-  return normalizeOpenFoodFactsProduct(data.product)
 }
