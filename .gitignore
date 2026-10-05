@@ -23,3 +23,9 @@ npm-debug.log*
 
 # Editor
 .vscode/
+
+# Ciqual files
+database/data/ciqual/
+
+# curl tests
+cookies.txt
