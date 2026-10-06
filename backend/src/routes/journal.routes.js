@@ -243,4 +243,53 @@ router.post('/', requireAuth, async (req, res) => {
   }
 })
 
+router.get('/', requireAuth, async (req, res) => {
+  try {
+    const { date } = req.query
+
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return res.status(400).json({
+        error: 'Invalid date'
+      })
+    }
+
+    const result = await pool.query(
+      `
+        SELECT
+          id,
+          food_id,
+          entry_date::text AS entry_date,
+          meal_type,
+          quantity,
+          quantity_mode,
+          reference_quantity_snapshot,
+          food_portion_id,
+          label,
+          calories_snapshot,
+          protein_snapshot,
+          carbs_snapshot,
+          fat_snapshot,
+          fiber_snapshot,
+          created_at,
+          updated_at
+        FROM journal_entry
+        WHERE user_id = $1
+          AND entry_date = $2
+        ORDER BY created_at ASC
+      `,
+      [req.session.userId, date]
+    )
+
+    return res.status(200).json({
+      entries: result.rows
+    })
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      error: 'Internal server error'
+    })
+  }
+})
+
 export default router
