@@ -28,4 +28,4 @@ npm-debug.log*
 database/data/ciqual/
 
 # curl tests
-cookies.txt
+cookies*.txt
