@@ -94,7 +94,38 @@ The food catalog supports:
 - validation of reference units (`g` or `ml`)
 - nullable nutritional values when data is unknown
 
-The database also includes food portions and journal-entry structures in preparation for food consumption tracking.
+The database also includes food portions and journal entries for direct food consumption tracking.
+
+## Food Journal
+
+Authenticated users can manage direct food consumption entries for a given day.
+
+The backend currently supports:
+
+- `POST /journal` to add a food consumption entry
+- `GET /journal?date=YYYY-MM-DD` to retrieve entries for a specific day
+- `PUT /journal/:id` to update an existing entry
+- `DELETE /journal/:id` to remove an entry
+
+Journal entries support two quantity modes:
+
+- `REFERENCE`: the entered quantity is already expressed in the food reference unit (`g` or `ml`)
+- `PORTION`: the entered quantity is converted using a predefined food portion
+
+When an entry is created or updated, PractiKcal stores:
+
+- the effective reference quantity consumed
+- calories
+- protein
+- carbohydrates
+- fat
+- fiber
+
+These values are stored as snapshots so that historical journal entries remain stable even if the related food or portion is modified later.
+
+Unknown nutritional values remain `null` and are not converted to `0`.
+
+Journal access is restricted to the authenticated user through the current server-side session.
 
 ## Open Food Facts Integration
 
@@ -188,9 +219,12 @@ Implemented foundations include:
 - personal food CRUD
 - Open Food Facts text search
 - Open Food Facts product normalization and synchronization
-- initial food portion and journal-entry database structures
+- food portions
+- food journal backend CRUD
+- nutritional snapshots for journal entries
+- reference and portion-based quantity handling
 
-Current Sprint 2 work focuses on completing the food data sources, implementing the food journal backend and connecting the search/add-food user flow.
+Current Sprint 2 work focuses on connecting the food search/add flow to the frontend and extending backend test coverage.
 
 ## Data Sources and Licenses
 
