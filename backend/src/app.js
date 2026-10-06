@@ -7,6 +7,7 @@ import pool from './config/database.js'
 import authRouter from './routes/auth.routes.js'
 import goalsRouter from './routes/goals.routes.js'
 import foodsRouter from './routes/foods.routes.js'
+import journalRouter from './routes/journal.routes.js'
 
 const app = express()
 
@@ -46,5 +47,6 @@ app.get('/', (req, res) => {
 app.use('/auth', authRouter)
 app.use('/goals', goalsRouter)
 app.use('/foods', foodsRouter)
+app.use('/journal', journalRouter)
 
 export default app
