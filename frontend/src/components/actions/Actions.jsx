@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 function Actions() {
   return (
     <main className="min-h-screen bg-[var(--color-background)] px-6 pt-8 pb-24">
@@ -6,9 +8,21 @@ function Actions() {
           Actions
         </h1>
 
-        <p className="mt-4 text-sm text-[var(--color-text-muted)]">
-          Les actions d’ajout seront disponibles prochainement.
-        </p>
+        <Link
+          to="/journal/add"
+          className="
+            mt-6
+            block
+            rounded-xl
+            bg-[var(--color-primary)]
+            px-4
+            py-3
+            text-center
+            font-semibold
+          "
+        >
+          Ajouter une entrée
+        </Link>
       </div>
     </main>
   )

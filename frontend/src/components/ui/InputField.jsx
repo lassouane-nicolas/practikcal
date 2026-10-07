@@ -1,26 +1,28 @@
 function InputField({
-    label,
-    ariaLabel,
-    id,
-    type = 'text',
-    error,
-    icon: Icon,
-    suffix,
-    ...props
+  label,
+  ariaLabel,
+  id,
+  type = 'text',
+  error,
+  icon: Icon,
+  suffix,
+  ...props
 }) {
-    return (
-        <div className="space-y-2">
-            <label
-                htmlFor={id}
-                className="block text-sm font-medium text-[var(--color-text)]"
-            >
-                {label}
-            </label>
+  return (
+    <div className="space-y-2">
+      {label && (
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-[var(--color-text)]"
+        >
+          {label}
+        </label>
+      )}
 
-            <div className="relative">
-                {suffix && (
-                    <span
-                        className="
+      <div className="relative">
+        {suffix && (
+          <span
+            className="
                           pointer-events-none
                           absolute
                           right-3
@@ -29,14 +31,14 @@ function InputField({
                           text-sm
                           text-[var(--color-text-muted)]
                         "
-                    >
-                        {suffix}
-                    </span>
-                )}
-                {Icon && (
-                    <Icon
-                        aria-hidden="true"
-                        className="
+          >
+            {suffix}
+          </span>
+        )}
+        {Icon && (
+          <Icon
+            aria-hidden="true"
+            className="
                           pointer-events-none
                           absolute
                           left-4
@@ -46,14 +48,14 @@ function InputField({
                           -translate-y-1/2
                           text-[var(--color-text-muted)]
                         "
-                    />
-                )}
+          />
+        )}
 
-                <input
-                    id={id}
-                    type={type}
-                    aria-label={ariaLabel}
-                    className={`
+        <input
+          id={id}
+          type={type}
+          aria-label={ariaLabel}
+          className={`
                       w-full
                       min-h-12
                       rounded-xl
@@ -70,22 +72,22 @@ function InputField({
                       focus:ring-2
                       focus:ring-[var(--color-primary)]/20
                     `}
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? `${id}-error` : undefined}
-                    {...props}
-                />
-            </div>
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
+          {...props}
+        />
+      </div>
 
-            {error && (
-                <p
-                    id={`${id}-error`}
-                    className="text-sm text-[var(--color-error)]"
-                >
-                    {error}
-                </p>
-            )}
-        </div>
-    )
+      {error && (
+        <p
+          id={`${id}-error`}
+          className="text-sm text-[var(--color-error)]"
+        >
+          {error}
+        </p>
+      )}
+    </div>
+  )
 }
 
 export default InputField

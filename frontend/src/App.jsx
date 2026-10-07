@@ -2,6 +2,7 @@ import AuthForm from "./components/auth/AuthForm";
 import Profile from './components/profile/Profile'
 import Actions from './components/actions/Actions'
 import NutritionGoalsForm from './components/goals/NutritionGoalsForm'
+import AddJournalEntry from './components/foods/AddJournalEntry'
 import AppLayout from './layouts/AppLayout'
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
@@ -95,6 +96,11 @@ function App() {
         <Route
           path="/goals"
           element={<NutritionGoalsForm />}
+        />
+
+        <Route
+          path="/journal/add"
+          element={<AddJournalEntry />}
         />
 
         <Route
