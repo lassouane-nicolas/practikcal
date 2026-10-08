@@ -4,7 +4,9 @@ import BottomNavigation from '../components/ui/BottomNavigation'
 function AppLayout() {
   const location = useLocation()
 
-  const showBottomNavigation = location.pathname !== '/goals'
+  const showBottomNavigation =
+    location.pathname !== '/goals' &&
+    location.pathname !== '/journal/add'
 
   return (
     <>
